@@ -218,6 +218,11 @@ public class GameSettingsView extends JPanel {
         incrementSlider.setValue((int)(settings.getSpeedIncrement() * 10));
         maxSpeedSlider.setValue((int)(settings.getMaxSpeed() * 10));
         livesSlider.setValue(settings.getStartLives());
+        
+        baseSpeedLabel.setText("Base Speed: " + settings.getBaseSpeed());
+        incrementLabel.setText("Speed Increment: " + settings.getSpeedIncrement());
+        maxSpeedLabel.setText("Max Speed: " + settings.getMaxSpeed());
+        livesLabel.setText("Starting Lives: " + settings.getStartLives());
     }
     
     private void saveSettings() {

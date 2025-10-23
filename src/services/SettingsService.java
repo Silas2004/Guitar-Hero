@@ -16,8 +16,11 @@ public class SettingsService {
         ensureResourcesDirectory();
         settings = loadSettings();
         if (settings == null) {
+            System.out.println("No settings found - creating defaults");
             settings = new GameSettings();
             saveSettings();
+        } else {
+            System.out.println("Settings loaded from file at startup!");
         }
     }
     
@@ -47,9 +50,9 @@ public class SettingsService {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
                 writer.write(json);
             }
-            System.out.println("Settings saved successfully to: " + filePath);
+            System.out.println("✓ Settings saved successfully to: " + filePath);
         } catch (IOException e) {
-            System.err.println("Failed to save settings: " + e.getMessage());
+            System.err.println("✗ Failed to save settings: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -58,7 +61,7 @@ public class SettingsService {
         File file = new File(filePath);
         
         if (!file.exists()) {
-            System.out.println("Settings file does not exist. Creating default settings.");
+            System.out.println("Settings file does not exist. Will create default settings.");
             return null;
         }
         
@@ -71,23 +74,29 @@ public class SettingsService {
             
             GameSettings loaded = jsonToSettings(jsonBuilder.toString());
             if (loaded != null) {
-                System.out.println("Settings loaded successfully from: " + filePath);
+                System.out.println("✓ Settings AUTO-LOADED from: " + filePath);
+                System.out.println("  → Lives: " + loaded.getStartLives());
+                System.out.println("  → Keys: " + loaded.getKeyLane1() + loaded.getKeyLane2() + 
+                                   loaded.getKeyLane3() + loaded.getKeyLane4());
                 return loaded;
             } else {
-                System.err.println("Loaded settings are null.");
+                System.err.println("✗ Loaded settings are null.");
                 return null;
             }
         } catch (IOException e) {
-            System.err.println("Error loading settings: " + e.getMessage());
+            System.err.println("✗ Error loading settings: " + e.getMessage());
             e.printStackTrace();
             backupCorruptedFile();
             return null;
         }
     }
     
+    
     public GameSettings reloadSettings() {
+        System.out.println("Reloading settings from file...");
         settings = loadSettings();
         if (settings == null) {
+            System.out.println("Reload failed - using defaults");
             settings = new GameSettings();
             saveSettings();
         }
@@ -111,10 +120,10 @@ public class SettingsService {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(exportFile))) {
                 writer.write(json);
             }
-            System.out.println("Settings exported successfully to: " + exportPath);
+            System.out.println("✓ Settings exported successfully to: " + exportPath);
             return true;
         } catch (IOException e) {
-            System.err.println("Failed to export settings: " + e.getMessage());
+            System.err.println("✗ Failed to export settings: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -124,7 +133,7 @@ public class SettingsService {
         File file = new File(importPath);
         
         if (!file.exists()) {
-            System.err.println("Import file does not exist: " + importPath);
+            System.err.println("✗ Import file does not exist: " + importPath);
             return false;
         }
         
@@ -138,15 +147,15 @@ public class SettingsService {
             GameSettings imported = jsonToSettings(jsonBuilder.toString());
             if (imported != null) {
                 this.settings = imported;
-                saveSettings();
-                System.out.println("Settings imported successfully from: " + importPath);
+                saveSettings(); // Speichert auch lokal!
+                System.out.println("✓ Settings imported and saved locally from: " + importPath);
                 return true;
             } else {
-                System.err.println("Failed to parse settings from file.");
+                System.err.println("✗ Failed to parse settings from file.");
                 return false;
             }
         } catch (IOException e) {
-            System.err.println("Failed to import settings: " + e.getMessage());
+            System.err.println("✗ Failed to import settings: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -155,7 +164,7 @@ public class SettingsService {
     public void resetToDefaults() {
         settings = new GameSettings();
         saveSettings();
-        System.out.println("Settings reset to defaults.");
+        System.out.println("✓ Settings reset to defaults and saved.");
     }
     
     private void ensureResourcesDirectory() {

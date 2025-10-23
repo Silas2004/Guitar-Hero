@@ -1,10 +1,10 @@
 {
-  "keyLane1": "A",
-  "keyLane2": "S",
+  "keyLane1": "Q",
+  "keyLane2": "W",
   "keyLane3": "D",
   "keyLane4": "F",
-  "baseSpeed": 1.5,
-  "speedIncrement": 0.1,
-  "maxSpeed": 5.0,
-  "startLives": 3
+  "baseSpeed": 5.0,
+  "speedIncrement": 2.0,
+  "maxSpeed": 10.0,
+  "startLives": 1
 }
