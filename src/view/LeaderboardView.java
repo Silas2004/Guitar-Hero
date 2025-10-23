@@ -1,6 +1,6 @@
 package view;
 
-import leaderboard.LeaderboardService;
+import services.*;
 import leaderboard.PlayerScore;
 
 import javax.swing.*;

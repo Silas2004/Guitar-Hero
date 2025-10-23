@@ -1,7 +1,10 @@
-package leaderboard;
+package services;
 
 import java.io.*;
 import java.nio.file.*;
+
+import leaderboard.Leaderboard;
+import leaderboard.PlayerScore;
 
 public class LeaderboardService {
     private static LeaderboardService instance;

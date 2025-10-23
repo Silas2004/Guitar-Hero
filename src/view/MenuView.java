@@ -41,6 +41,19 @@ public class MenuView extends JPanel {
                 resetNameFieldBorder();
             }
         });
+        
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                Timer timer = new Timer(50, evt -> {
+                    nameField.requestFocusInWindow();
+                    nameField.selectAll();
+                    ((Timer) evt.getSource()).stop();
+                });
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
     }
 
     public void setOnStartGame(Runnable callback) {
@@ -107,10 +120,6 @@ public class MenuView extends JPanel {
         g2d.setColor(new Color(0, 255, 255));
         g2d.setFont(new Font("Arial", Font.BOLD, 24));
         g2d.drawString("Press ENTER to start", 175, 500);
-
-        g2d.setColor(new Color(150, 150, 150));
-        g2d.setFont(new Font("Arial", Font.PLAIN, 18));
-        g2d.drawString("ESC - Quit", 250, 580);
 
         g2d.setColor(new Color(255, 255, 0, 180));
         int[] starX = {100, 500, 80, 520, 300};

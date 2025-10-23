@@ -23,20 +23,19 @@ public class GameModel {
         this.elapsedTime = 0L;
         this.random = new Random();
         this.gameOver = false;
-        this.lives = settings.getStartLives();  
+        this.lives = settings.getStartLives();
         initLanes();
     }
-    
-    public int getHitLineY() {
-        return hitLineY;
-    }
-    
+
     private void initLanes() {
         lanes.clear();
-        lanes.add(new Lane(100, 'A'));
-        lanes.add(new Lane(200, 'S'));
-        lanes.add(new Lane(300, 'D'));
-        lanes.add(new Lane(400, 'F'));
+        lanes.add(new Lane(100, settings.getKeyLane1()));
+        lanes.add(new Lane(200, settings.getKeyLane2()));
+        lanes.add(new Lane(300, settings.getKeyLane3()));
+        lanes.add(new Lane(400, settings.getKeyLane4()));
+    }
+    public int getHitLineY() {
+        return hitLineY;
     }
     
     public void reset() {
