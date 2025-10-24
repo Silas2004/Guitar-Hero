@@ -3,6 +3,10 @@ package leaderboard;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/*
+ * Playerscore of ever single Player. The leaderboard system is based on this model. But only needed for Leaderboard. So it shouldnt be a general Model i hope xD.
+ */
+
 public class PlayerScore implements Serializable, Comparable<PlayerScore> {
     private static final long serialVersionUID = 1L;
 

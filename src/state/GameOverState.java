@@ -4,6 +4,8 @@ import view.GameOverView;
 
 import java.awt.Graphics;
 
+// State Pattern for each State
+
 public class GameOverState implements GameState {
     private final GameOverView view;
 

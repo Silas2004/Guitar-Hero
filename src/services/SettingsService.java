@@ -7,6 +7,12 @@ import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Saving, Reload, Import, Export
+ * from Json Files
+ * Trys autoimport, if corrupted than reload basic settings and save them
+ */
+
 public class SettingsService {
     private static SettingsService instance;
     private GameSettings settings;

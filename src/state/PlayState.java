@@ -6,6 +6,8 @@ import view.GameView;
 
 import java.awt.Graphics;
 
+//State Pattern for each State
+
 public class PlayState implements GameState {
     private final GameModel model;
     private final GameController controller;

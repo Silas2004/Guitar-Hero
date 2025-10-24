@@ -7,12 +7,14 @@ public class MenuView extends JPanel {
     private JTextField nameField;
     private JLabel nameLabel;
     private Runnable onStartGame;
+    private Runnable onOpenSettings;
 
     public MenuView() {
         setPreferredSize(new Dimension(600, 800));
         setBackground(Color.BLACK);
         setLayout(null);
-        setFocusable(false);
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
 
         nameLabel = new JLabel("Enter your name:");
         nameLabel.setBounds(200, 350, 200, 30);
@@ -40,24 +42,52 @@ public class MenuView extends JPanel {
             public void keyTyped(KeyEvent e) {
                 resetNameFieldBorder();
             }
+            
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() != KeyEvent.VK_ESCAPE) {
+                    resetNameFieldBorder();
+                }
+            }
         });
         
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                Timer timer = new Timer(50, evt -> {
-                    nameField.requestFocusInWindow();
-                    nameField.selectAll();
+                focusNameField();
+                
+                Timer focusTimer = new Timer(100, evt -> {
+                    focusNameField();
                     ((Timer) evt.getSource()).stop();
                 });
-                timer.setRepeats(false);
-                timer.start();
+                focusTimer.setRepeats(false);
+                focusTimer.start();
+            }
+        });
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                focusNameField();
+            }
+        });
+        
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE && onOpenSettings != null) {
+                    onOpenSettings.run();
+                }
             }
         });
     }
 
     public void setOnStartGame(Runnable callback) {
         this.onStartGame = callback;
+    }
+    
+    public void setOnOpenSettings(Runnable callback) {
+        this.onOpenSettings = callback;
     }
 
     public String getPlayerName() {
@@ -72,6 +102,18 @@ public class MenuView extends JPanel {
 
     public void showInvalidNameError() {
         nameField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+        Timer shakeTimer = new Timer(50, null);
+        final int[] shakeCount = {0};
+        shakeTimer.addActionListener(e -> {
+            if (shakeCount[0]++ < 6) {
+                int offset = (shakeCount[0] % 2 == 0) ? 5 : -5;
+                nameField.setLocation(175 + offset, 390);
+            } else {
+                nameField.setLocation(175, 390);
+                ((Timer) e.getSource()).stop();
+            }
+        });
+        shakeTimer.start();
     }
 
     public void resetNameFieldBorder() {
@@ -79,8 +121,12 @@ public class MenuView extends JPanel {
     }
 
     public void focusNameField() {
-        nameField.requestFocusInWindow();
-        nameField.selectAll();
+        SwingUtilities.invokeLater(() -> {
+            nameField.setFocusable(true);
+            nameField.requestFocusInWindow();
+            nameField.selectAll();
+            nameField.getCaret().setVisible(true);
+        });
     }
 
     @Override
@@ -120,6 +166,10 @@ public class MenuView extends JPanel {
         g2d.setColor(new Color(0, 255, 255));
         g2d.setFont(new Font("Arial", Font.BOLD, 24));
         g2d.drawString("Press ENTER to start", 175, 500);
+
+        g2d.setColor(new Color(255, 255, 255, 150));
+        g2d.setFont(new Font("Arial", Font.PLAIN, 16));
+        g2d.drawString("Press ESC for Settings", 200, 530);
 
         g2d.setColor(new Color(255, 255, 0, 180));
         int[] starX = {100, 500, 80, 520, 300};

@@ -1,5 +1,6 @@
 package model;
 
+// Score with combo System and Metrics for highest combo in Score
 public class Score {
     private int totalScore;
     private int combo;  

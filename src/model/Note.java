@@ -1,5 +1,6 @@
 package model;
 
+// Each single Note in Lane
 public class Note {
     private int x, y;
     private char key;

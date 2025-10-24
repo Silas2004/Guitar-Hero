@@ -1,5 +1,7 @@
 package model;
-
+/*
+ * Settings Model with all Attributes for the Settings View and the Settings.json
+ */
 public class GameSettings {
     private char keyLane1;
     private char keyLane2;

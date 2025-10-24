@@ -5,6 +5,9 @@ import java.nio.file.*;
 
 import leaderboard.Leaderboard;
 import leaderboard.PlayerScore;
+/*
+ * Serializing and De-Serializing Leaderboard from Leaderboard.dat
+ */
 
 public class LeaderboardService {
     private static LeaderboardService instance;

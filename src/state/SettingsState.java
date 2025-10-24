@@ -2,6 +2,8 @@ package state;
 
 import view.GameSettingsView;
 
+//State Pattern for each State
+
 public class SettingsState implements GameState {
     private GameSettingsView view;
     

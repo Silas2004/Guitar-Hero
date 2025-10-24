@@ -5,6 +5,8 @@ import view.MenuView;
 
 import java.awt.Graphics;
 
+//State Pattern for each State
+
 public class MenuState implements GameState {
     private final GameController controller;
     private final MenuView view;

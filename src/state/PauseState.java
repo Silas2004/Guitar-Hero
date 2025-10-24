@@ -4,6 +4,8 @@ import view.GameView;
 
 import java.awt.Graphics;
 
+//State Pattern for each State
+
 public class PauseState implements GameState {
     private final GameView view;
 

@@ -1,9 +1,9 @@
 package controller;
 
-import controller.GameController;
 import dispatcher.GameDispatcher;
 import model.GameModel;
 import model.GameSettings;
+import observer.GameObserver;
 import services.LeaderboardService;
 import services.SettingsService;
 import state.*;
@@ -11,9 +11,12 @@ import view.*;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.time.InstantSource;
 
-public class MainController {
+/**
+ * Main controller coordinating game components.
+ * Manages game states, view transitions, and user input.
+ */
+public class MainController implements GameObserver {
     private JFrame frame;
     private GameModel model;
     private GameController controller;
@@ -34,17 +37,41 @@ public class MainController {
 
     private boolean isPaused = false;
     private String playerName = "Player";
-    private int hitLineY = 700;
+    
+    private static final int HIT_LINE_Y = 700;
 
     public void start() {
+        initializeFrame();
+        initializeGame();
+        initializeViews();
+        initializeStates();
+        
+        setState(menuState);
+        
+        frame.setVisible(true);
+        setupInputHandling();
+        startGameLoop();
+    }
+    
+    private void initializeFrame() {
         frame = new JFrame("Guitar Hero");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 800);
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
+        frame.setFocusTraversalKeysEnabled(false);
+    }
 
-        initializeGame();
-
+    private void initializeGame() {
+        GameSettings settings = SettingsService.getInstance().getSettings();
+        model = new GameModel(settings, HIT_LINE_Y);
+        model.addObserver(this);
+        
+        controller = new GameController(model);
+        dispatcher = new GameDispatcher(model);
+    }
+    
+    private void initializeViews() {
         menuView = new MenuView();
         menuView.setOnStartGame(() -> {
             if (menuView.isPlayerNameValid()) {
@@ -54,76 +81,99 @@ public class MainController {
                 menuView.showInvalidNameError();
             }
         });
-
+        menuView.setOnOpenSettings(() -> {
+            setState(settingsState);
+        });
+        
+        gameView = new GameView(model);
+        gameOverView = new GameOverView(0);
+        
+        gameSettingsView = new GameSettingsView();
+        gameSettingsView.setOnBack(() -> {
+            if (isPaused) {
+                setState(pauseState);
+            } else {
+                setState(menuState);
+            }
+        });
+        gameSettingsView.setOnSettingsSaved(() -> {
+            if (controller != null) {
+                controller.reloadKeys();
+            }
+        });
+    }
+    
+    private void initializeStates() {
         menuState = new MenuState(controller, menuView);
+        playState = new PlayState(model, controller, gameView);
         pauseState = new PauseState(gameView);
-
-        setState(menuState);
-
-        frame.setVisible(true);
-
+        gameOverState = new GameOverState(gameOverView);
+        settingsState = new SettingsState(gameSettingsView);
+    }
+    
+    private void setupInputHandling() {
         frame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                e.consume();
+                
                 if (currentState == playState) {
-                    if (e.getKeyCode() == KeyEvent.VK_P) {
-                        togglePause();
-                    } else {
-                        controller.keyPressed(e);
-                    }
+                    handlePlayStateInput(e);
                 } else if (currentState == pauseState) {
-                    if (e.getKeyCode() == KeyEvent.VK_P) {
-                        togglePause();
-                    }
-                    if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    	setState(settingsState);
-                    }
+                    handlePauseStateInput(e);
                 } else if (currentState == menuState) {
-                    if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    	setState(settingsState);
-                    }
+                    handleMenuStateInput(e);
                 } else if (currentState == gameOverState) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        setState(menuState);
-                    }
+                    handleGameOverStateInput(e);
                 }
             }
         });
-
+    }
+    
+    private void handlePlayStateInput(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_P || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            togglePause();
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                setState(settingsState);
+            }
+        } else {
+            controller.keyPressed(e);
+        }
+    }
+    
+    private void handlePauseStateInput(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_P) {
+            togglePause();
+        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            setState(settingsState);
+        }
+    }
+    
+    private void handleMenuStateInput(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            setState(settingsState);
+        }
+    }
+    
+    private void handleGameOverStateInput(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            setState(menuState);
+        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            setState(settingsState);
+        }
+    }
+    
+    private void startGameLoop() {
         dispatcher.start();
-
+        
         Timer gameLoopTimer = new Timer(16, e -> {
             if (currentState == playState && !isPaused) {
-                dispatcher.start();
                 model.update(16);
-                if (model.isGameOver()) {
-                    endGame();
-                }
             }
             frame.repaint();
         });
+        gameLoopTimer.setCoalesce(true);
         gameLoopTimer.start();
-    }
-
-    private void initializeGame() {
-        GameSettings settings = SettingsService.getInstance().getSettings();
-        model = new GameModel(settings, hitLineY);
-        controller = new GameController(model);
-        dispatcher = new GameDispatcher(model);
-        gameView = new GameView(model);
-        gameOverView = new GameOverView(0);
-
-        gameSettingsView = new GameSettingsView();
-        gameSettingsView.setOnBack(() -> setState(menuState));
-        gameSettingsView.setOnSettingsSaved(() -> {
-            if (controller != null) {
-                controller = new GameController(model);
-            }
-        });
-        
-        playState = new PlayState(model, controller, gameView);
-        gameOverState = new GameOverState(gameOverView);
-        settingsState = new SettingsState(gameSettingsView);
     }
 
     private void setState(GameState newState) {
@@ -131,34 +181,35 @@ public class MainController {
         currentState = newState;
         currentState.enter();
 
-        if (newState instanceof MenuState) {
-            frame.setContentPane(menuView);
-            menuView.focusNameField();
-        } else if (newState instanceof PlayState) {
-            frame.setContentPane(gameView);
-            gameView.setFocusable(true);
-            gameView.requestFocusInWindow();
-        } else if (newState instanceof PauseState) {
-            frame.setContentPane(gameView);
-            gameView.setFocusable(true);
-            gameView.requestFocusInWindow();
-        } else if (newState instanceof GameOverState) {
-            frame.setContentPane(gameOverView);
-        } else if (newState instanceof SettingsState) {
-        	frame.setContentPane(gameSettingsView);
-        }
-
+        updateView(newState);
+        
         frame.revalidate();
         frame.repaint();
         
-        SwingUtilities.invokeLater(() -> {
-            frame.requestFocus();
-        });
+        SwingUtilities.invokeLater(() -> frame.requestFocus());
+    }
+    
+    private void updateView(GameState state) {
+        if (state instanceof MenuState) {
+            frame.setContentPane(menuView);
+            SwingUtilities.invokeLater(() -> menuView.focusNameField());
+        } else if (state instanceof PlayState || state instanceof PauseState) {
+            frame.setContentPane(gameView);
+            gameView.setFocusable(true);
+            SwingUtilities.invokeLater(() -> gameView.requestFocusInWindow());
+        } else if (state instanceof GameOverState) {
+            frame.setContentPane(gameOverView);
+            SwingUtilities.invokeLater(() -> frame.requestFocus());
+        } else if (state instanceof SettingsState) {
+            frame.setContentPane(gameSettingsView);
+        }
     }
     
     private void startGame() {
         GameSettings settings = SettingsService.getInstance().reloadSettings();
-        model = new GameModel(settings, hitLineY);
+        model = new GameModel(settings, HIT_LINE_Y);
+        model.addObserver(this);
+        
         controller = new GameController(model);
         dispatcher = new GameDispatcher(model);
         gameView = new GameView(model);
@@ -184,11 +235,30 @@ public class MainController {
 
     private void endGame() {
         dispatcher.stop();
+        isPaused = false;
         int finalScore = model.getScore().getTotalScore();
         LeaderboardService.getInstance().addScore(
                 new leaderboard.PlayerScore(playerName, finalScore));
         gameOverView = new GameOverView(finalScore);
         gameOverState = new GameOverState(gameOverView);
         setState(gameOverState);
+    }
+    
+    @Override
+    public void onGameStateChanged() {
+    }
+    
+    //Maybe soudn effects in future?, should be similiar to the songs in the xamarin Version
+    @Override
+    public void onNoteHit(int points) {
+    }
+    
+    @Override
+    public void onNoteMissed() {
+    }
+    
+    @Override
+    public void onGameOver(int finalScore) {
+        SwingUtilities.invokeLater(this::endGame);
     }
 }

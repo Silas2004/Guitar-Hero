@@ -3,7 +3,8 @@ package model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+//Gamelane Model
+// Notes in each Lane and part of hit/missed system
 public class Lane {
     private int x;            
     private char key;          

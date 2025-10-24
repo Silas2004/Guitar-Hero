@@ -44,10 +44,10 @@ public class GameOverView extends JPanel {
         g2d.drawString("LEADERBOARD", 190, 260);
 
         g2d.setColor(new Color(50, 50, 50));
-        g2d.fillRoundRect(80, 290, 440, 410, 20, 20);
+        g2d.fillRoundRect(80, 290, 440, 360, 20, 20);
         g2d.setColor(new Color(0, 255, 255));
         g2d.setStroke(new BasicStroke(3));
-        g2d.drawRoundRect(80, 290, 440, 410, 20, 20);
+        g2d.drawRoundRect(80, 290, 440, 360, 20, 20);
 
         var scores = LeaderboardService.getInstance().getLeaderboard().getScores();
         int y = 330;
@@ -68,14 +68,18 @@ public class GameOverView extends JPanel {
             int scoreWidth = g2d.getFontMetrics().stringWidth(score);
             g2d.drawString(score, 480 - scoreWidth, y);
 
-            y += 37;
+            y += 32;
             rank++;
 
             if (rank > 10) break;
         }
 
         g2d.setColor(new Color(0, 255, 255));
-        g2d.setFont(new Font("Arial", Font.BOLD, 24));
-        g2d.drawString("Press ENTER to continue", 145, 730);
+        g2d.setFont(new Font("Arial", Font.BOLD, 22));
+        g2d.drawString("Press ENTER to continue", 160, 690);
+        
+        g2d.setColor(new Color(255, 255, 255, 150));
+        g2d.setFont(new Font("Arial", Font.PLAIN, 18));
+        g2d.drawString("Press ESC for Settings", 185, 720);
     }
 }
