@@ -131,11 +131,8 @@ public class MainController implements GameObserver {
     }
     
     private void handlePlayStateInput(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_P || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        if (e.getKeyCode() == KeyEvent.VK_P) {
             togglePause();
-            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                setState(settingsState);
-            }
         } else {
             controller.keyPressed(e);
         }
@@ -144,8 +141,6 @@ public class MainController implements GameObserver {
     private void handlePauseStateInput(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_P) {
             togglePause();
-        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            setState(settingsState);
         }
     }
     
