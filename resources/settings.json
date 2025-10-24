@@ -6,5 +6,5 @@
   "baseSpeed": 3.0,
   "speedIncrement": 1.0,
   "maxSpeed": 10.0,
-  "startLives": 3
+  "startLives": 10
 }
