@@ -5,7 +5,7 @@ A rhythm-based music game built with Java Swing, featuring a clean MVC architect
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
 ![Swing](https://img.shields.io/badge/GUI-Swing-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-
+[![GitHub](https://img.shields.io/badge/GitHub-Silas2004/Guitar--Hero-181717?style=flat-square&logo=github)](https://github.com/Silas2004/Guitar-Hero)
 ## Overview
 
 Guitar Hero is a professional Java implementation of a rhythm game where players hit notes as they fall down the screen. The project demonstrates clean software architecture principles including MVC, Observer Pattern, and Command Pattern.
